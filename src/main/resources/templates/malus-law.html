@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Lab IRNTU — Закон Малюса</title>
+
+    <!-- CSRF Token Meta Tags -->
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <link rel="stylesheet" href="/malus-law.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="main-layout">
+    <div class="col-left">
+        <div class="card header-card">
+            <div>
+                <h1 class="title">Стенд №1: Закон Малюса</h1>
+                <p class="subtitle">ИРНИТУ • ИТиАД • ИСИБ</p>
+            </div>
+            <div class="formula">
+                $$I_A = \frac{1}{2}\, I_0 \cos^2 \varphi$$
+            </div>
+        </div>
+
+        <div class="card bench">
+            <div class="laser-unit bench-item">
+                <div class="laser-label">ИСТОЧНИК</div>
+                <div class="laser-nozzle"></div>
+                <div class="laser-led"></div>
+                <div class="hover-info"><b>Лазер:</b> Генерирует поток естественного света с интенсивностью I₀.</div>
+            </div>
+
+            <div class="beam bench-item" id="beam-1"><div class="beam-core"></div></div>
+
+            <div class="bench-item" id="pos-pol">
+                <div class="optic-group">
+                    <div class="rim" id="rim-p"><div class="glass"><div class="vector"></div></div></div>
+                    <div class="label-text">Поляризатор</div>
+                    <div class="hover-info"><b>Поляризатор:</b> Пропускает только колебания в одной плоскости. После него свет становится линейно поляризованным с интенсивностью ½I₀.</div>
+                </div>
+            </div>
+
+            <div class="beam bench-item" id="beam-2"><div class="beam-core"></div></div>
+
+            <div class="bench-item" id="pos-an">
+                <div class="optic-group">
+                    <div class="rim" id="rim-a"><div class="glass"><div class="vector"></div></div></div>
+                    <div class="label-text">Анализатор (φ)</div>
+                    <div class="hover-info"><b>Анализатор:</b> Второй поляроид. Вращай его, чтобы менять угол φ между осями пропускания и наблюдать изменение интенсивности.</div>
+                </div>
+            </div>
+
+            <div class="beam bench-item" id="beam-3"><div class="beam-core"></div></div>
+        </div>
+
+        <div class="card chart-card">
+            <canvas id="mainChart" height="280"></canvas>
+            <button id="btn-clear">Очистить график</button>
+        </div>
+    </div>
+
+    <div class="col-right">
+        <div class="card res-box">
+            <span class="res-title">Интенсивность I<sub>A</sub></span>
+            <big id="val-i" th:text="${#numbers.formatDecimal(model.result, 1, 2)}">0</big>
+            <span class="res-unit" id="val-unit"></span>
+        </div>
+
+        <div class="card controls">
+            <div class="control-group">
+                <div class="control-header">
+                    <label class="label-gold">I₀ (начальная интенсивность)</label>
+                    <input type="number" id="n-i0" th:value="${model.intensity0}" class="num-in" min="0" step="1">
+                </div>
+                <input type="range" id="r-i0" min="0" max="1000" th:value="${model.intensity0}" step="1" class="slider-gold">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <label class="label-blue">φ (угол, °)</label>
+                    <input type="number" id="n-phi" th:value="${model.phi}" class="num-in" min="0" max="360" step="1">
+                </div>
+                <input type="range" id="r-phi" min="0" max="360" th:value="${model.phi}" step="1" class="slider-blue">
+            </div>
+
+            <div class="control-group" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">
+                <div class="control-header">
+                    <label style="color:#94a3b8; font-weight:bold;">Знаков после запятой</label>
+                    <input type="number" id="n-decimals" class="num-in" min="0" max="6" value="2" step="1">
+                </div>
+                <button class="btn-action" id="btn-round" style="background:#475569; margin-top:8px;">Округлить до целых</button>
+            </div>
+        </div>
+
+        <div class="card manual-text">
+            <h3>📖 Подробная справка</h3>
+
+            <div class="manual-item">
+                <strong>Суть опыта</strong>
+                <p>Естественный (неполяризованный) свет с интенсивностью I₀ проходит последовательно через два поляроида — поляризатор и анализатор. На выходе измеряется интенсивность I_A в зависимости от угла φ между их осями пропускания.</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Что такое поляризация?</strong>
+                <p>Свет — поперечная электромагнитная волна. В естественном свете вектор E колеблется во всех направлениях, перпендикулярных лучу. Поляризатор выделяет из этого хаоса только одну плоскость колебаний.</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Поляризатор</strong>
+                <p>Первый поляроид. Пропускает только ту компоненту вектора E, которая совпадает с его осью. После поляризатора интенсивность уменьшается вдвое: $I_P = \frac{1}{2} I_0$.</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Анализатор</strong>
+                <p>Второй поляроид. Его ось повёрнута на угол φ относительно оси поляризатора. Проходит только проекция вектора E на ось анализатора: $E_A = E_P \cos \varphi$. Так как интенсивность пропорциональна квадрату амплитуды, получаем закон Малюса.</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Формула (Закон Малюса)</strong>
+                <p>$$I_A = \frac{1}{2}\, I_0 \cos^2 \varphi$$</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Обозначения</strong>
+                <p><b>I₀</b> — интенсивность падающего естественного света.<br>
+                   <b>φ</b> — угол между осями пропускания поляризатора и анализатора.<br>
+                   <b>I_A</b> — интенсивность после анализатора.<br>
+                   <b>½</b> — коэффициент, учитывающий потерю половины интенсивности на первом поляризаторе.</p>
+            </div>
+
+            <div class="manual-item">
+                <strong>Частные случаи</strong>
+                <p><b>φ = 0°</b> — оси параллельны → максимум: $I_A = \frac{1}{2} I_0$.<br>
+                   <b>φ = 45°</b> — $I_A = \frac{1}{4} I_0$.<br>
+                   <b>φ = 90°</b> — оси скрещены → $I_A = 0$ (свет полностью блокируется).</p>
+            </div>
+
+            <div id="status">Готов к работе</div>
+        </div>
+    </div>
+</div>
+
+<script src="/malus-law.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+</body>
+</html>
+

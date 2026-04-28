@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<body>
+<div class="header" th:fragment="pageHeader">
+    <div class="header-brand">
+        <h1>Симуляция законов Кирхгофа</h1>
+        <p class="header-subtitle"><a href="/" style="color: inherit;">← на главную</a></p>
+    </div>
+    <div class="header-right">
+        <div class="header-date" th:text="${date}"></div>
+    </div>
+</div>
+</body>
+</html>
+

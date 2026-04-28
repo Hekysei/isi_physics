@@ -1,0 +1,96 @@
+:root { --accent: #3b82f6; --gold: #fbbf24; --bg: #0b1121; --panel: #1e293b; --tip-bg: rgba(15, 23, 42, 0.98); }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #e2e8f0; margin: 0; padding: 25px; display: flex; justify-content: center; }
+
+.main-layout { display: grid; grid-template-columns: 2.8fr 1.2fr; gap: 25px; width: 1450px; max-width: 98vw; }
+.col-left, .col-right { display: flex; flex-direction: column; gap: 20px; }
+
+.card { background: var(--panel); border-radius: 20px; padding: 25px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; }
+
+/* СТЕНД (ЖЕСТКАЯ ФИКСАЦИЯ) */
+.bench {
+    position: relative;
+    height: 380px;
+    background: #020617;
+    border-radius: 24px;
+    border: 2px solid #334155;
+    box-shadow: inset 0 0 100px rgba(0,0,0,1);
+    overflow: hidden;
+}
+
+.bench-item { position: absolute; top: 50%; transform: translateY(-50%); }
+
+/* ЛАЗЕР */
+.laser-unit {
+    left: 40px;
+    width: 125px; height: 60px;
+    background: linear-gradient(145deg, #475569, #1e293b);
+    border-radius: 8px; border: 1px solid #64748b;
+    z-index: 10; cursor: help;
+}
+.laser-nozzle { position: absolute; right: -5px; top: 18px; width: 14px; height: 24px; background: #2d3748; border-radius: 3px; border: 1px solid #4a5568; }
+.laser-lens { position: absolute; right: -2px; top: 21.5px; width: 5px; height: 17px; background: #ef4444; border-radius: 1px; box-shadow: 0 0 15px #ef4444; }
+.laser-led { position: absolute; top: 10px; left: 15px; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+.laser-label { position: absolute; top: -35px; width: 100%; text-align: center; color: var(--accent); font-size: 0.75rem; font-weight: 900; letter-spacing: 1.5px; }
+
+/* ПРИБОРЫ */
+#pos-pol { left: 280px; z-index: 5; }
+#pos-an { left: 580px; z-index: 5; }
+
+/* ЛУЧИ */
+#beam-1 { left: 165px; width: 115px; }
+#beam-2 { left: 420px; width: 160px; }
+#beam-3 { left: 720px; width: 340px; }
+
+.beam { height: 4px; background: none; z-index: 1; pointer-events: none; }
+.beam-core { width: 100%; height: 100%; background: linear-gradient(90deg, #fff, var(--gold)); box-shadow: 0 0 25px var(--gold), 0 0 10px #fff; }
+
+/* ОПТИКА */
+.optic-group { display: flex; flex-direction: column; align-items: center; position: relative; }
+.rim { width: 140px; height: 140px; border: 6px solid #4a5568; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); box-shadow: 0 15px 40px rgba(0,0,0,0.8); transition: border-color 0.3s; }
+.rim:hover { border-color: var(--accent); }
+.rim::before, .rim::after { content: ''; position: absolute; width: 2px; height: 10px; background: #64748b; }
+.rim::before { top: 5px; } .rim::after { bottom: 5px; }
+
+.glass { width: 115px; height: 115px; background: rgba(59, 130, 246, 0.04); border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(1px); display: flex; align-items: center; justify-content: center; position: relative; }
+.vector { width: 2px; height: 100%; background: #fff; box-shadow: 0 0 20px #fff; position: absolute; }
+.label-text { position: absolute; bottom: -40px; width: 100%; text-align: center; font-size: 0.85rem; color: #94a3b8; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+
+/* ПОДСКАЗКИ */
+.hover-info {
+    position: absolute; bottom: 170px; left: 50%; transform: translateX(-50%);
+    background: var(--tip-bg); color: #fff; padding: 15px; border-radius: 12px;
+    font-size: 0.9rem; width: 260px; text-align: center; border: 1px solid var(--accent);
+    opacity: 0; pointer-events: none; transition: 0.3s; z-index: 100; line-height: 1.4;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+.laser-unit:hover .hover-info { opacity: 1; left: 0; transform: none; text-align: left; }
+.optic-group:hover .hover-info { opacity: 1; }
+/* ИНТЕРФЕЙС */
+.res-box { text-align: center; padding: 25px; background: linear-gradient(145deg, #1e293b, #0c1425); border-radius: 20px; border: 1px solid #334155; }
+.res-title { font-size: 0.8rem; color: #94a3b8; letter-spacing: 3px; text-transform: uppercase; }
+.res-box big { font-size: 3.5rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 50px rgba(251, 191, 36, 0.4); display: block; }
+.res-unit { font-size: 0.9rem; color: #64748b; }
+
+.control-group { margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+.control-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.label-gold { font-weight: bold; color: var(--gold); }
+.label-blue { font-weight: bold; color: var(--accent); }
+.num-in { width: 70px; background: #0b1121; border: 1px solid #334155; color: var(--accent); padding: 8px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1rem; }
+.slider-gold { width: 100%; accent-color: var(--gold); }
+.slider-blue { width: 100%; accent-color: var(--accent); }
+
+.mini-control { margin-top:20px; }
+.mini-header { display:flex; justify-content:space-between; margin-bottom:8px; }
+.num-in-small { width:60px; background:none; border:none; color:var(--accent); text-align:right; font-weight:bold; }
+
+.manual-text { line-height: 1.6; font-size: 0.95rem; background: #0f172a; border-top: 5px solid var(--accent); }
+.manual-text h3 { color: var(--accent); font-size: 1.3rem; margin: 0 0 15px 0; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+.manual-item { margin-bottom: 15px; }
+.manual-item strong { color: var(--gold); display: block; margin-bottom: 4px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+.manual-item p { margin: 0; color: #cbd5e1; }
+
+#status { font-weight: bold; color: var(--accent); text-align: center; border-top: 1px solid #334155; padding-top: 10px; font-size: 1rem; }
+.btn-action { color:white; border:none; padding:12px; border-radius:10px; width:100%; margin-top:15px; cursor:pointer; font-weight:bold; text-transform:uppercase; transition: 0.3s; }
+#btn-clear { background: #445bef; color: white; }  #btn-clear:hover { background: #3226dc; }
+.btn-calc { background: var(--accent); } .btn-calc:hover { background: #2563eb; }
+
