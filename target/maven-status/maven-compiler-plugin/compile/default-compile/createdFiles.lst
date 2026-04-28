@@ -1,9 +1,0 @@
-com/example/isib/model/CircuitResults.class
-com/example/isib/model/CircuitModel.class
-com/example/isib/ui/SimulationController.class
-com/example/isib/model/CircuitData.class
-com/example/isib/model/ErrorRate.class
-com/example/isib/IsibApplication.class
-com/example/isib/api/SimulationRestController.class
-com/example/isib/SecurityConfiguration.class
-com/example/isib/ui/LoginController.class
