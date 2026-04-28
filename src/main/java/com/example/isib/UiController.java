@@ -1,4 +1,4 @@
-package com.example.isib.web.ui;
+package com.example.isib;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
