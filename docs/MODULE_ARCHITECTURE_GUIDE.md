@@ -46,6 +46,8 @@ project-root/
 
 ## Мини-чеклист перед переносом
 
+- Подсказка: для быстрой проверки доступных путей можно использовать скрипт `scripts/scan_paths.py`.
+
 - [ ] Весь код модуля находится в `src/main/.../featureX`.
 - [ ] Все тесты модуля находятся в `src/test/.../featureX`.
 - [ ] Все ресурсы лежат в `src/resources/( templates , static )/featureX`.

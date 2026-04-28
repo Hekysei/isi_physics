@@ -2,7 +2,6 @@ package com.example.isib;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
