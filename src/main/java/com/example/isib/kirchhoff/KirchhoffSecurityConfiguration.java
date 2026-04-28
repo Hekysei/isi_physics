@@ -23,6 +23,7 @@ public class KirchhoffSecurityConfiguration {
             .requestMatchers(
                 "/kirchhoff/login",
                 "/kirchhoff/register",
+                "/kirchhoff/api/labs",
                 "/kirchhoff/css/**",
                 "/kirchhoff/js/**",
                 "/error",

@@ -32,7 +32,7 @@ async function loadLabs() {
     }
 
     try {
-        const response = await fetch(`/kirchhoff/api/labs?t=${Date.now()}`, { cache: "no-store" });
+        const response = await fetch(`/api/labs?t=${Date.now()}`, { cache: "no-store" });
         if (!response.ok) {
             showLoadError(container);
             return;

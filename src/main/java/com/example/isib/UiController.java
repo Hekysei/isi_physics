@@ -2,7 +2,6 @@ package com.example.isib;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ public class UiController {
         return "title";
     }
 
-    @GetMapping(value = "/kirchhoff/api/labs", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/labs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<String> labs() throws IOException {
         ClassPathResource classPathLabs = new ClassPathResource("static/labs.json");
