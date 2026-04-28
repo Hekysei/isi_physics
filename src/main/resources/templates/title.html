@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторные работы ИСИб-25-1</title>
+    <link rel="stylesheet" href="/title.css">
+</head>
+<body>
+<main class="page-shell">
+    <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+            <p class="eyebrow">Физика / ИСИб-25-1</p>
+            <h1 id="page-title">Лабораторные работы студентов группы ИСИб-25-1</h1>
+            <p class="lead">
+                Общий сайт с интерактивными лабораторными работами студентов. Выберите работу из списка ниже, чтобы открыть ее страницу.
+            </p>
+        </div>
+
+        <div class="lab-visual" aria-hidden="true">
+            <div class="beam beam-a"></div>
+            <div class="beam beam-b"></div>
+            <div class="glass glass-left"></div>
+            <div class="glass glass-right"></div>
+            <div class="sensor">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="catalog" aria-labelledby="catalog-title">
+        <div class="section-head">
+            <div>
+                <p class="section-kicker">Каталог работ</p>
+                <h2 id="catalog-title">Доступные лабораторные</h2>
+            </div>
+            <p>Список расширяется через файл <code>labs.json</code>.</p>
+        </div>
+
+        <div id="labs" class="labs" aria-live="polite"></div>
+    </section>
+</main>
+
+<script src="/title.js"></script>
+</body>
+</html>
