@@ -18,7 +18,7 @@ public class UiController {
         return "title";
     }
 
-    @GetMapping(value = "/api/labs", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/kirchhoff/api/labs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<String> labs() throws IOException {
         ClassPathResource classPathLabs = new ClassPathResource("static/labs.json");
