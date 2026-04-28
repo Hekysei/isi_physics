@@ -34,7 +34,7 @@ project-root/
     │       │   └── featureX/*
     └── test/
         ├── java/
-            └── com/company/product/
+            └── com/example/isib/
                 └── featureX/*
 ```
 
