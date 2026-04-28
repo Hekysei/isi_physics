@@ -16,9 +16,9 @@
 	</parent>
 
 	<groupId>com.example</groupId>
-	<artifactId>isi_phys</artifactId>
+	<artifactId>isib</artifactId>
 	<version>1.0.0</version>
-	<name>isi_physics</name>
+	<name>isib</name>
 	<description>laba dlya phisici</description>
 
 	<properties>

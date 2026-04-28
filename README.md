@@ -43,9 +43,9 @@
 
 ### **1\. Клонирование репозитория**
 
-git clone https://github.com/Hekysei/isi_physics
+git clone https://github.com/Hekysei/isib
 
-cd isi_physics
+cd isib
 
 ### **2\. Сборка проекта**
 

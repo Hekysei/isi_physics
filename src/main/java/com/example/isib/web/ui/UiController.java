@@ -1,4 +1,4 @@
-package com.example.isi_phys.web.ui;
+package com.example.isib.web.ui;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

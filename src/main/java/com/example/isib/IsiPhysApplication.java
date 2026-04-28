@@ -1,4 +1,4 @@
-package com.example.isi_phys;
+package com.example.isib;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
