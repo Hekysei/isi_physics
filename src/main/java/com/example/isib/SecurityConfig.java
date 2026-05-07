@@ -14,7 +14,25 @@ public class SecurityConfig {
     @Order(0)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/", "/api/labs", "/title.css", "/title.js")
+            .securityMatcher(
+                "/",
+                "/api/labs",
+                "/title.css",
+                "/title.js",
+                "/resistance/**",
+                "/findeds/**",
+                "/myapp",
+                "/myapp/**",
+                "/interference",
+                "/interference/**",
+                "/api/interference",
+                "/bulletvelocity",
+                "/bulletvelocity/**",
+                "/maluslaw",
+                "/maluslaw/**",
+                "/css/**",
+                "/js/**"
+            )
             .authorizeHttpRequests(authorize -> authorize
                 .anyRequest().permitAll()
             )

@@ -2,12 +2,17 @@
   {
     "student": "Вахромеев Раидон, Гиниятов Руслан",
     "title": "Скорость полета пули",
-    "url": "https://github.com/radikdollar/bulletvelocity"
+    "url": "/bulletvelocity"
   },
   {
     "student": "Андреев Лев, Бандеев Баяжап",
     "title": "Удельное сопротивление и температура",
-    "url": "https://github.com/Reakchy/PhysicsProjectNEW"
+    "url": "/resistance"
+  },
+  {
+    "student": "Товпинец Максим, Мальцев Дмитрий",
+    "title": "Определение ЭДС и внутреннего сопротивления источника тока",
+    "url": "/findeds"
   },
   {
     "student": "Каталкин Семен, Шеин Алексей",
@@ -17,12 +22,7 @@
   {
     "student": "Глазунова Елизавета, Паелов Роман",
     "title": "Интерференция света",
-    "url": "https://github.com/elzvtaw/interference-physics.git"
-  },
-  {
-    "student": "Товпинец Максим, Мальцев Дмитрий",
-    "title": "Определение ЭДС и внутреннего сопротивления источника тока",
-    "url": "https://github.com/Creilt/Project1.git"
+    "url": "/interference"
   },
   {
     "student": "Винокурова Таисия, Аксенова Елизавета",
@@ -32,11 +32,11 @@
   {
     "student": "Петров Илья, Ожогова Мария",
     "title": "Закон Малуса",
-    "url": "/malus-law"
+    "url": "/maluslaw"
   },
   {
     "student": "Калинина Анастасия, Рудых Дмитрий",
     "title": "Закон Гука: имитация пружины",
-    "url": "https://github.com/mot1v217/java-project"
+    "url": "/myapp"
   }
 ]

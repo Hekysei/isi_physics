@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Закон Гука — модель пружины</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top, #eef4ff 0%, #d9e4ff 100%);
+        color: #1f2937;
+      }
+      .wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1 {
+        margin-bottom: 8px;
+        font-size: clamp(2rem, 3vw, 3rem);
+        color: #1b2561;
+      }
+      p {
+        margin: 0 0 16px;
+        line-height: 1.65;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: 0 20px 60px rgba(29, 56, 127, 0.12);
+      }
+      canvas {
+        width: 100%;
+        height: 320px;
+        border-radius: 18px;
+        background: #f4f8ff;
+        box-shadow: inset 0 0 0 1px rgba(79, 115, 192, 0.1);
+      }
+      .controls {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+      .field label {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+      }
+      .field input[type="range"] {
+        width: 100%;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .stat {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: #eef3ff;
+        color: #263f6f;
+      }
+      footer {
+        margin-top: 20px;
+        font-size: 0.95rem;
+        color: #4a4f5a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Закон Гука: имитация пружины</h1>
+      <p>
+        Перетащите груз на холсте и посмотрите, как прирастает сила упругости.
+        Здесь пружина моделируется как упругая связь вокруг положения равновесия.
+      </p>
+      <div class="card">
+        <canvas id="springCanvas" width="860" height="320"></canvas>
+        <div class="stats">
+          <div class="stat" id="forceDisplay">сила упругости: 0 Н</div>
+          <div class="stat" id="displacementDisplay">смещение: 0 px</div>
+        </div>
+        <div class="controls">
+          <div class="field">
+            <label>
+              <span>Жёсткость к</span>
+              <span id="kValue">1.50</span>
+            </label>
+            <input id="kSlider" type="range" min="0.2" max="3.5" step="0.01" value="1.5" />
+          </div>
+          <div class="field">
+            <label>
+              <span>Масса</span>
+              <span id="massValue">1.00</span>
+            </label>
+            <input id="massSlider" type="range" min="0.3" max="2.8" step="0.05" value="1.0" />
+          </div>
+          <div class="field">
+            <label>
+              <span>Демпфирование</span>
+              <span id="dampValue">0.14</span>
+            </label>
+            <input id="dampSlider" type="range" min="0.0" max="0.45" step="0.01" value="0.14" />
+          </div>
+        </div>
+        <footer>F = −k·x | скорость меняется из-за массы и демпфирования</footer>
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("springCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const anchorX = 140;
+      const equilibriumX = 400;
+      const minMassX = 240;
+      const maxMassX = 560;
+
+      let massX = equilibriumX;
+      let velocity = 0;
+      let stiffness = 1.5;
+      let mass = 1.0;
+      let damping = 0.14;
+      let isDragging = false;
+
+      const kSlider = document.getElementById("kSlider");
+      const massSlider = document.getElementById("massSlider");
+      const dampSlider = document.getElementById("dampSlider");
+      const kValue = document.getElementById("kValue");
+      const massValue = document.getElementById("massValue");
+      const dampValue = document.getElementById("dampValue");
+      const forceDisplay = document.getElementById("forceDisplay");
+      const displacementDisplay = document.getElementById("displacementDisplay");
+
+      function updateSliders() {
+        stiffness = parseFloat(kSlider.value);
+        mass = parseFloat(massSlider.value);
+        damping = parseFloat(dampSlider.value);
+        kValue.textContent = stiffness.toFixed(2);
+        massValue.textContent = mass.toFixed(2);
+        dampValue.textContent = damping.toFixed(2);
+      }
+
+      kSlider.addEventListener("input", updateSliders);
+      massSlider.addEventListener("input", updateSliders);
+      dampSlider.addEventListener("input", updateSliders);
+      updateSliders();
+
+      function updateLabels() {
+        const dx = massX - equilibriumX;
+        forceDisplay.textContent = `сила упругости: ${(-stiffness * dx).toFixed(1)} Н`;
+        displacementDisplay.textContent = `смещение: ${dx.toFixed(1)} px`;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.strokeStyle = "#4a80e5";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(anchorX, 80);
+        ctx.lineTo(equilibriumX, 200);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.strokeStyle = "#3a4f70";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        const startX = anchorX + 20;
+        const endX = massX - 18;
+        const startY = 122;
+        const endY = 200;
+        const segments = 10;
+        const dx = (endX - startX) / segments;
+        const dy = (endY - startY) / segments;
+        ctx.moveTo(startX, startY);
+        for (let i = 1; i <= segments; i += 1) {
+          const x = startX + dx * i;
+          const y = startY + dy * i + (i % 2 === 0 ? 16 : -16) * Math.sin((i / segments) * Math.PI);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = "#d44c2f";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+        ctx.shadowBlur = 16;
+        ctx.fillRect(massX - 22, 180, 44, 44);
+        ctx.restore();
+      }
+
+      function step() {
+        if (!isDragging) {
+          const dx = equilibriumX - massX;
+          const force = stiffness * dx;
+          const acceleration = force / mass;
+          velocity = velocity * (1 - damping * 0.08) + acceleration * 0.2;
+          massX += velocity;
+          if (massX < minMassX) massX = minMassX;
+          if (massX > maxMassX) massX = maxMassX;
+        }
+        updateLabels();
+        draw();
+        requestAnimationFrame(step);
+      }
+
+      canvas.addEventListener("pointerdown", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        if (event.clientX >= rect.left + massX - 40 && event.clientX <= rect.left + massX + 40) {
+          isDragging = true;
+          canvas.setPointerCapture(event.pointerId);
+        }
+      });
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (!isDragging) return;
+        const rect = canvas.getBoundingClientRect();
+        massX = Math.min(maxMassX, Math.max(minMassX, event.clientX - rect.left));
+        velocity = 0;
+      });
+
+      canvas.addEventListener("pointerup", () => {
+        isDragging = false;
+      });
+
+      canvas.addEventListener("pointerleave", () => {
+        isDragging = false;
+      });
+
+      requestAnimationFrame(step);
+    </script>
+  </body>
+</html>
