@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Удельное сопротивление</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #eef3f7; color: #222; }
+        .lab-background { position: fixed; inset: 0; width: 100%; height: 100vh; z-index: 1; opacity: 0.65; pointer-events: none; }
+        .page-overlay { position: relative; z-index: 2; }
+        .wire-cold { stroke: #8f969c; filter: none; }
+        .wire-warm { stroke: #ff9800; filter: drop-shadow(0 0 6px rgba(255, 152, 0, 0.9)); }
+        .wire-hot { stroke: #ff3b3b; filter: drop-shadow(0 0 14px rgba(255, 59, 59, 0.95)); }
+        .wire-core-cold { stroke: rgba(255, 255, 255, 0.18); }
+        .wire-core-warm { stroke: rgba(255, 235, 180, 0.75); filter: drop-shadow(0 0 5px rgba(255, 200, 0, 0.8)); }
+        .wire-core-hot { stroke: rgba(255, 245, 210, 0.95); filter: drop-shadow(0 0 9px rgba(255, 230, 180, 0.95)); }
+        .lab-flame-outer { animation: flameOuter 1.3s ease-in-out infinite alternate; transform-origin: 690px 520px; }
+        .lab-flame-inner { animation: flameInner 0.9s ease-in-out infinite alternate; transform-origin: 705px 520px; }
+        .lab-heat { animation: heatGlow 1.6s ease-in-out infinite alternate; }
+        @keyframes flameOuter { from { transform: scaleY(1) scaleX(1); opacity: 0.88; } to { transform: scaleY(1.08) scaleX(0.96); opacity: 1; } }
+        @keyframes flameInner { from { transform: scaleY(1) scaleX(1); opacity: 0.9; } to { transform: scaleY(1.12) scaleX(0.92); opacity: 1; } }
+        @keyframes heatGlow { from { opacity: 0.6; } to { opacity: 0.48; } }
+        header { background: rgba(47, 93, 138, 0.92); color: white; padding: 16px 24px; border-bottom: 1px solid #264b6d; backdrop-filter: blur(3px); }
+        header h1 { margin: 0; font-size: 24px; }
+        nav { margin-top: 8px; }
+        nav a { color: white; text-decoration: none; margin-right: 18px; font-size: 15px; }
+        nav a:hover { text-decoration: underline; }
+        .container { position: fixed; right: 20px; top: 100px; bottom: 100px; width: 420px; z-index: 10; overflow-y: auto; padding: 0 8px; }
+        .layout { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+        .card { background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(215, 221, 228, 0.95); border-radius: 10px; padding: 18px; backdrop-filter: blur(6px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+        .card h2 { margin-top: 0; margin-bottom: 14px; font-size: 20px; color: #2f5d8a; }
+        .card h3 { margin-top: 20px; margin-bottom: 10px; font-size: 17px; color: #2f5d8a; }
+        p, li { line-height: 1.5; font-size: 14px; }
+        .formula { background: rgba(238, 244, 250, 0.88); border-left: 4px solid #2f5d8a; padding: 10px 12px; margin: 12px 0; font-size: 16px; border-radius: 4px; }
+        .form-grid { display: grid; gap: 12px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid #bfc8d2; border-radius: 6px; font-size: 14px; background: rgba(255, 255, 255, 0.92); }
+        .buttons { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+        button, .btn-secondary { padding: 8px 16px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+        button { background: #2f5d8a; color: white; }
+        button:hover { background: #244b70; }
+        .btn-secondary { background: rgba(233, 237, 241, 0.92); color: #222; }
+        .btn-secondary:hover { background: rgba(219, 226, 232, 0.98); }
+        .error { margin-top: 12px; padding: 10px; background: rgba(253, 234, 234, 0.94); border: 1px solid #e5b8b8; color: #9f2d2d; border-radius: 6px; font-size: 13px; }
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .result-item { border: 1px solid rgba(215, 221, 228, 0.95); border-radius: 6px; padding: 10px; background: rgba(250, 251, 252, 0.82); font-size: 13px; }
+        .result-item strong { display: block; margin-bottom: 4px; color: #2f5d8a; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: rgba(255, 255, 255, 0.45); font-size: 13px; }
+        th, td { border: 1px solid rgba(215, 221, 228, 0.95); padding: 6px 8px; text-align: center; }
+        th { background: rgba(238, 244, 250, 0.92); }
+        .chart-section { margin-top: 18px; }
+        .chart-title { font-weight: bold; margin-bottom: 10px; font-size: 16px; color: #2f5d8a; }
+        .graphic-panel { border: 1px solid rgba(215, 221, 228, 0.95); border-radius: 8px; background: rgba(250, 251, 252, 0.78); padding: 12px; backdrop-filter: blur(3px); }
+        .graphic-panel h4 { margin: 0 0 10px 0; font-size: 15px; color: #2f5d8a; }
+        .graphic-text { line-height: 1.5; color: #444; font-size: 13px; }
+        .graphic-list { margin: 10px 0 0 16px; padding: 0; font-size: 13px; }
+        .graphic-list li { margin-bottom: 4px; }
+        footer { text-align: center; color: #555; padding: 20px; font-size: 14px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 5; background: rgba(255, 255, 255, 0.5); }
+        @media (max-width: 900px) {
+            .container { position: relative; right: auto; top: auto; bottom: auto; width: 100%; max-width: 600px; margin: 24px auto; overflow: visible; }
+            .layout { flex-direction: column; }
+            .row, .results-grid { grid-template-columns: 1fr; }
+            .lab-background { opacity: 0.4; }
+            .card { background: rgba(255, 255, 255, 0.9); }
+        }
+        .loading { opacity: 0.6; pointer-events: none; position: relative; }
+        .loading::after { content: "⏳"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    </style>
+</head>
+<body>
+
+<div class="lab-background">
+    <svg viewBox="0 0 1400 900" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <radialGradient id="bgLight" cx="50%" cy="70%" r="60%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+                <stop offset="100%" stop-color="#d9e5ef" stop-opacity="0.08"/>
+            </radialGradient>
+            <radialGradient id="heatSpot" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffb347" stop-opacity="0.55"/>
+                <stop offset="55%" stop-color="#ff7a2d" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#ff7a2d" stop-opacity="0"/>
+            </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="1400" height="900" fill="url(#bgLight)"/>
+        <rect x="0" y="760" width="1400" height="140" fill="#cdd8e1" opacity="0.35"/>
+        <polygon points="135,735 365,735 420,775 405,850 120,800" fill="#5c88b8" stroke="#355d87" stroke-width="5"/>
+        <rect x="280" y="160" width="26" height="560" fill="#c9ced3" stroke="#7f878e" stroke-width="4"/>
+        <circle cx="293" cy="405" r="26" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <rect x="145" y="394" width="135" height="20" rx="4" fill="#d1d5d9" stroke="#7f878e" stroke-width="3"/>
+        <rect x="295" y="399" width="205" height="18" rx="4" transform="rotate(23 295 399)" fill="#4f7eb3" stroke="#2d5682" stroke-width="3"/>
+        <rect x="470" y="450" width="62" height="40" rx="7" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <rect x="494" y="490" width="18" height="84" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <circle cx="502" cy="470" r="16" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <rect x="910" y="450" width="62" height="40" rx="7" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <rect x="934" y="490" width="18" height="84" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <circle cx="942" cy="470" r="16" fill="#4f7eb3" stroke="#2d5682" stroke-width="4"/>
+        <line x1="532" y1="468" x2="910" y2="468" stroke="#98a0a7" stroke-width="3" opacity="0.3"/>
+        <ellipse class="lab-heat" cx="722" cy="560" rx="150" ry="100" fill="url(#heatSpot)"/>
+        <path id="wireOuter" d="M532,468 C630,487 800,487 910,468" fill="none" stroke-width="18" stroke-linecap="round" class="wire-cold"/>
+        <path id="wireCore" d="M532,468 C630,487 800,487 910,468" fill="none" stroke-width="7" stroke-linecap="round" class="wire-core-cold"/>
+        <path d="M532,468 C630,487 800,487 910,468" fill="none" stroke="#6f757b" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+        <path d="M140,744 C315,660 470,590 650,496" fill="none" stroke="#3d342c" stroke-width="14" stroke-linecap="round"/>
+        <path d="M148,738 C320,657 475,588 644,500" fill="none" stroke="#9e6a2e" stroke-width="5" stroke-linecap="round"/>
+        <path class="lab-flame-outer" d="M700,618 C663,575 676,520 709,470 C722,509 748,524 748,574 C766,546 793,531 801,486 C829,544 820,621 772,659 C748,678 716,673 700,618 Z" fill="#f68b2d" stroke="#d46219" stroke-width="4"/>
+        <path class="lab-flame-inner" d="M732,627 C710,600 718,559 742,525 C750,552 764,566 764,595 C776,580 787,568 794,540 C811,573 802,622 775,641 C760,652 742,648 732,627 Z" fill="#ffd86a" stroke="#e9b43d" stroke-width="2.5"/>
+        <text x="508" y="404" font-size="46" fill="#23303c" font-family="Arial">R₁</text>
+        <text x="894" y="404" font-size="46" fill="#23303c" font-family="Arial">R₂</text>
+        <text x="500" y="610" font-size="34" fill="#23303c" font-family="Arial" opacity="0.72">T₁</text>
+        <text x="875" y="610" font-size="34" fill="#23303c" font-family="Arial" opacity="0.72">T₂</text>
+        <text x="673" y="718" font-size="34" fill="#b3551d" font-family="Arial">нагрев нити</text>
+        <text x="62" y="100" font-size="38" fill="#2f5d8a" font-family="Arial" opacity="0.5">Лабораторная установка</text>
+    </svg>
+</div>
+
+<div class="page-overlay">
+    <header>
+        <h1>Удельное сопротивление металлической нити</h1>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="/resistance">Описание</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+
+            <div class="card">
+                <h2>Теория</h2>
+                <p>При изменении температуры меняется удельное сопротивление металла, а значит меняется и сопротивление проводника.</p>
+                <div class="formula">ρ₂ = ρ₁ · (1 + α · (t₂ − t₁))</div>
+                <div class="formula">R = ρ · L / S</div>
+                <p>Обозначения:</p>
+                <ul>
+                    <li><b>ρ</b> — удельное сопротивление, Ом·мм²/м</li>
+                    <li><b>R</b> — сопротивление нити, Ом</li>
+                    <li><b>L</b> — длина нити, м</li>
+                    <li><b>S</b> — площадь поперечного сечения, мм²</li>
+                    <li><b>α</b> — температурный коэффициент сопротивления</li>
+                    <li><b>t₁</b> — начальная температура</li>
+                    <li><b>t₂</b> — конечная температура</li>
+                </ul>
+
+                <h3>Справочные данные</h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Металл</th>
+                        <th>ρ₁</th>
+                        <th>α</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>Медь</td><td>0.0175</td><td>0.0043</td></tr>
+                    <tr><td>Алюминий</td><td>0.0280</td><td>0.0040</td></tr>
+                    <tr><td>Железо</td><td>0.1000</td><td>0.0060</td></tr>
+                    <tr><td>Вольфрам</td><td>0.0550</td><td>0.0045</td></tr>
+                    <tr><td>Нихром</td><td>1.1000</td><td>0.0004</td></tr>
+                    <tr><td>Серебро</td><td>0.0160</td><td>0.0038</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Калькулятор</h2>
+                <form id="calcForm" class="form-grid">
+                    <div>
+                        <label for="metal">Металл нити</label>
+                        <select id="metal" name="metal">
+                            <option value="Медь">Медь</option>
+                            <option value="Алюминий">Алюминий</option>
+                            <option value="Железо">Железо</option>
+                            <option value="Вольфрам">Вольфрам</option>
+                            <option value="Нихром">Нихром</option>
+                            <option value="Серебро">Серебро</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="t1">Начальная температура t₁, °C</label>
+                            <input id="t1" name="t1" type="number" step="0.01" value="20">
+                        </div>
+                        <div>
+                            <label for="t2">Конечная температура t₂, °C</label>
+                            <input id="t2" name="t2" type="number" step="0.01" value="100">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="length">Длина нити L, м</label>
+                            <input id="length" name="length" type="number" step="0.0001" value="1.0">
+                        </div>
+                        <div>
+                            <label for="diameterMm">Диаметр нити d, мм</label>
+                            <input id="diameterMm" name="diameterMm" type="number" step="0.0001" value="0.5">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="rho1">ρ₁, Ом·мм²/м</label>
+                            <input id="rho1" type="number" step="0.000001" readonly>
+                        </div>
+                        <div>
+                            <label for="alpha">α, 1/°C</label>
+                            <input id="alpha" type="number" step="0.000001" readonly>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button type="submit">Рассчитать</button>
+                        <button type="button" class="btn-secondary" id="resetBtn">Сбросить</button>
+                    </div>
+                </form>
+
+                <div id="ajaxError" class="error" style="display:none"></div>
+
+                <div id="ajaxResults" style="display:none">
+                    <h3>Результаты</h3>
+                    <div class="results-grid" id="resultsGrid"></div>
+                    <div class="chart-section">
+                        <div class="chart-title">Графическое отображение</div>
+                        <div class="graphic-panel">
+                            <h4>Что показывает фон страницы</h4>
+                            <div class="graphic-text">
+                                На фоне изображена лабораторная установка: штатив, держатели, металлическая нить и источник нагрева.
+                                После расчёта цвет нити меняется в зависимости от конечной температуры.
+                            </div>
+                            <ul class="graphic-list">
+                                <li>серая нить — слабый нагрев (до 100°C)</li>
+                                <li>оранжевая нить — средний нагрев (100-300°C)</li>
+                                <li>красная нить со свечением — сильный нагрев (выше 300°C)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>Проект на Spring Boot + Thymeleaf + Fetch API</footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('calcForm');
+        const metalSelect = document.getElementById('metal');
+        const resultsDiv = document.getElementById('ajaxResults');
+        const errorDiv = document.getElementById('ajaxError');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        const METAL_DATA = {
+            'Медь': { rho1: 0.0175, alpha: 0.0043 },
+            'Алюминий': { rho1: 0.0280, alpha: 0.0040 },
+            'Железо': { rho1: 0.1000, alpha: 0.0060 },
+            'Вольфрам': { rho1: 0.0550, alpha: 0.0045 },
+            'Нихром': { rho1: 1.1000, alpha: 0.0004 },
+            'Серебро': { rho1: 0.0160, alpha: 0.0038 }
+        };
+
+        metalSelect.addEventListener('change', function() {
+            const data = METAL_DATA[this.value];
+            if (data) {
+                document.getElementById('rho1').value = data.rho1.toFixed(6);
+                document.getElementById('alpha').value = data.alpha.toFixed(6);
+            }
+        });
+
+        if (metalSelect.value) {
+            metalSelect.dispatchEvent(new Event('change'));
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('t1').value = 20;
+            document.getElementById('t2').value = 100;
+            document.getElementById('length').value = 1.0;
+            document.getElementById('diameterMm').value = 0.5;
+            metalSelect.value = 'Медь';
+            metalSelect.dispatchEvent(new Event('change'));
+
+            resultsDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            updateWireColor(20);
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            errorDiv.style.display = 'none';
+            resultsDiv.style.display = 'none';
+            form.classList.add('loading');
+
+            const data = {
+                metal: metalSelect.value,
+                t1: +document.getElementById('t1').value,
+                t2: +document.getElementById('t2').value,
+                length: +document.getElementById('length').value,
+                diameterMm: +document.getElementById('diameterMm').value,
+                rho1: +document.getElementById('rho1').value,
+                alpha: +document.getElementById('alpha').value
+            };
+
+            if ([data.t1, data.t2, data.length, data.diameterMm].some(isNaN)) {
+                showError('❌ Заполните все числовые поля');
+                form.classList.remove('loading');
+                return;
+            }
+
+            try {
+                const res = await fetch('/resistance/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const json = await res.json();
+
+                if (!res.ok) throw new Error(json.error || 'Ошибка расчёта');
+
+                showResults(json);
+                updateWireColor(data.t2);
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                form.classList.remove('loading');
+            }
+        });
+
+        function showResults(data) {
+            const items = [
+                { l: 'Металл', v: data.metal },
+                { l: 'Δt', v: fmt(data.dt, 4) + ' °C' },
+                { l: 'k', v: fmt(data.k, 6) },
+                { l: 'S', v: fmt(data.areaMm2, 6) + ' мм²' },
+                { l: 'ρ₁', v: fmt(data.rho1, 6) + ' Ом·мм²/м' },
+                { l: 'ρ₂', v: fmt(data.rho2, 6) + ' Ом·мм²/м' },
+                { l: 'Δρ', v: fmt(data.deltaRho, 6) + ' Ом·мм²/м' },
+                { l: 'Изменение', v: fmt(data.percent, 4) + ' %' },
+                { l: 'R₁', v: fmt(data.r1, 6) + ' Ом' },
+                { l: 'R₂', v: fmt(data.r2, 6) + ' Ом' }
+            ];
+            resultsGrid.innerHTML = items.map(i =>
+                `<div class="result-item"><strong>${i.l}</strong><span>${i.v}</span></div>`
+            ).join('');
+            resultsDiv.style.display = 'block';
+        }
+
+        function updateWireColor(t2) {
+            const outer = document.getElementById('wireOuter');
+            const core = document.getElementById('wireCore');
+            if (!outer || !core) return;
+
+            outer.className = '';
+            core.className = '';
+            if (t2 > 300) {
+                outer.classList.add('wire-hot');
+                core.classList.add('wire-core-hot');
+            } else if (t2 > 100) {
+                outer.classList.add('wire-warm');
+                core.classList.add('wire-core-warm');
+            } else {
+                outer.classList.add('wire-cold');
+                core.classList.add('wire-core-cold');
+            }
+        }
+
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+        }
+
+        function fmt(num, dec) {
+            return num == null ? '—' : Number(num).toFixed(dec).replace(/\.?0+$/, '');
+        }
+    });
+</script>
+
+</body>
+</html>
