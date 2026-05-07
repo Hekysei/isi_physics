@@ -30,6 +30,8 @@ public class SecurityConfig {
                 "/bulletvelocity/**",
                 "/maluslaw",
                 "/maluslaw/**",
+                "/capacity",
+                "/capacity/**",
                 "/css/**",
                 "/js/**"
             )

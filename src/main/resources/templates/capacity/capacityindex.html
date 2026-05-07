@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Физика: Электроемкость конденсаторов</title>
+    <link rel="stylesheet" th:href="@{/capacity/css/capacitystyle.css}">
+</head>
+<body>
+
+<div class="background-overlay"></div>
+
+<div class="main-card">
+    <div class="header">
+        <h1>Лабораторная работа по физике</h1>
+        <p>Определение электроемкости конденсаторов</p>
+    </div>
+
+    <div class="grid-capacitors">
+        <!-- 1. Плоский конденсатор (оставляем как есть) -->
+        <div class="capacitor-panel">
+            <div class="panel-title"><h3>1. Плоский конденсатор</h3></div>
+            <div class="visualization">
+                <svg width="220" height="140" viewBox="0 0 220 140">
+                    <rect id="flatTopPlate" x="65" y="20" width="100" height="70" fill="rgba(176, 196, 222, 0.2)" stroke="#6c8e9e" stroke-width="1.5" transform="skewX(-15)" />
+                    <rect id="flatBottomPlate" x="45" y="40" width="100" height="70" fill="rgba(127, 161, 188, 0.4)" stroke="#2c5a7a" stroke-width="1.5" transform="skewX(-15)" />
+                </svg>
+            </div>
+            <div class="controls">
+                <div class="input-group">
+                    <label>Материал диэлектрика</label>
+                    <select id="dielectricMaterial">
+                        <option value="1.0">Вакуум / Воздух (ε = 1.0)</option>
+                        <option value="3.0">Бумага (ε = 3.0)</option>
+                        <option value="2.5">Полиэтилен (ε = 2.5)</option>
+                        <option value="4.5">Стекло (ε = 4.5)</option>
+                        <option value="5.0">Слюда (ε = 5.0)</option>
+                        <option value="4.6">Масло касторовое (ε = 4.6)</option>
+                        <option value="6.0">Фарфор (ε = 6.0)</option>
+                        <option value="80">Вода (ε = 80)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Площадь S <span>(см²)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="flatSquareSlider" min="10" max="450" value="120">
+                        <input type="number" id="flatSquareNum" value="120">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Проницаемость ε <span>(отн.)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="flatEpsilonSlider" min="1" max="10" step="0.1" value="1.0">
+                        <input type="number" id="flatEpsilonNum" step="0.1" value="1.0">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Расстояние d <span>(мм)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="flatDistanceSlider" min="0.5" max="15" step="0.1" value="2.5">
+                        <input type="number" id="flatDistanceNum" step="0.1" value="2.5">
+                    </div>
+                </div>
+                <div class="result-area">Ёмкость: <span id="flatCapValue">0.00</span> пФ</div>
+            </div>
+        </div>
+
+        <!-- 2. Цилиндрический конденсатор (ИСПРАВЛЕННЫЙ SVG) -->
+        <div class="capacitor-panel">
+            <div class="panel-title"><h3>2. Цилиндрический конденсатор</h3></div>
+            <div class="visualization">
+                <svg width="220" height="170" viewBox="0 0 220 170" id="cylinderSvg">
+                    <ellipse id="outer-top" cx="110" cy="30" rx="60" ry="15" fill="none" stroke="#3b6e8f" stroke-width="1.5" />
+                    <rect id="outer-body" x="50" y="30" width="120" height="100" fill="none" stroke="#3b6e8f" stroke-width="1.5" />
+                    <ellipse id="outer-bottom" cx="110" cy="130" rx="60" ry="15" fill="none" stroke="#3b6e8f" stroke-width="1.5" />
+
+                    <ellipse id="inner-top" cx="110" cy="30" rx="25" ry="7" fill="rgba(142, 176, 200, 0.3)" stroke="#2a5778" stroke-width="1.5" />
+                    <rect id="inner-body" x="85" y="30" width="50" height="100" fill="rgba(142, 176, 200, 0.3)" stroke="#2a5778" stroke-width="1.5" />
+                    <ellipse id="inner-bottom" cx="110" cy="130" rx="25" ry="7" fill="rgba(142, 176, 200, 0.3)" stroke="#2a5778" stroke-width="1.5" />
+
+                    <line id="axis-line" x1="110" y1="15" x2="110" y2="150" stroke="#2a5778" stroke-dasharray="5,5" opacity="0.5" />
+                </svg>
+            </div>
+            <div class="controls">
+                <div class="input-group">
+                    <label>Длина L <span>(см)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="cylLengthSlider" min="5" max="25" step="0.5" value="10">
+                        <input type="number" id="cylLengthNum" value="10">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Радиус R₁ <span>(см)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="cylR1Slider" min="0.5" max="5" step="0.1" value="1.5">
+                        <input type="number" id="cylR1Num" value="1.5">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Радиус R₂ <span>(см)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="cylR2Slider" min="1" max="10" step="0.1" value="3.5">
+                        <input type="number" id="cylR2Num" value="3.5">
+                    </div>
+                </div>
+                <div class="result-area">Ёмкость: <span id="cylCapValue">0.00</span> пФ</div>
+                <div id="cylWarning" class="warning-text" style="color: red; font-size: 0.8em;"></div>
+            </div>
+        </div>
+
+        <!-- 3. Сферический конденсатор (оставляем как есть) -->
+        <div class="capacitor-panel">
+            <div class="panel-title"><h3>3. Сферический конденсатор</h3></div>
+            <div class="visualization">
+                <svg width="190" height="170" viewBox="0 0 190 170">
+                    <circle id="outerSphere" cx="95" cy="85" r="60" fill="none" stroke="#3a6e8f" stroke-width="1.5" stroke-dasharray="4 2" />
+                    <circle id="innerSphere" cx="95" cy="85" r="30" fill="rgba(154, 181, 207, 0.4)" stroke="#2a5778" stroke-width="1.5" />
+                    <ellipse id="outerSphereOrbit" cx="95" cy="85" rx="60" ry="20" fill="none" stroke="#3a6e8f" stroke-width="1" opacity="0.3" />
+                    <line id="sphAxisLine" x1="35" y1="85" x2="155" y2="85" stroke="#3a6e8f" stroke-width="1" opacity="0.3" />
+                </svg>
+            </div>
+            <div class="controls">
+                <div class="input-group">
+                    <label>Радиус R₁ <span>(см)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="sphR1Slider" min="1" max="6" step="0.1" value="2">
+                        <input type="number" id="sphR1Num" value="2">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Радиус R₂ <span>(см)</span></label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="sphR2Slider" min="2" max="12" step="0.1" value="5">
+                        <input type="number" id="sphR2Num" value="5">
+                    </div>
+                </div>
+                <div class="result-area">Ёмкость: <span id="sphCapValue">0.00</span> пФ</div>
+                <div id="sphWarning" class="warning-text" style="color: red; font-size: 0.8em;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/capacity/js/capacityscript.js}"></script>
+</body>
+</html>
